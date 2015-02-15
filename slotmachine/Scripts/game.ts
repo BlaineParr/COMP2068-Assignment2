@@ -21,12 +21,12 @@ var fruits = "";
 var winRatio = 0;
 
 //Tally Variables
-var grapes = 0;
-var bananas = 0;
-var oranges = 0;
+var fish = 0;
+var mice = 0;
+var birds = 0;
 var cherries = 0;
 var bars = 0;
-var bells = 0;
+var balls = 0;
 var sevens = 0;
 var blanks = 0;
 
@@ -70,7 +70,7 @@ function createUI(): void {
     game.addChild(spinButton);
 
     
-    //spinButton.addEventListener("click", spinReels);
+    spinButton.addEventListener("click", spinReels);
     spinButton.addEventListener("mouseover", spinButtonOver);
     spinButton.addEventListener("mouseout", spinButtonOut);
 } //function createUI ends
@@ -82,12 +82,26 @@ function spinButtonOut() {
 } //function spinButtonOut ends
 
 function spinButtonOver() {
-    spinButton.alpha = 0.0;
+    spinButton.alpha = 0.5;
 } //function spinButtonOut ends
 
 function spinReels() {
     // Add Spin Reels code here
-} //function spinReels ends
+    spinResult = Reels();
+    fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
+    console.log(fruits);
+
+    for (var tile = 0; tile < 3; tile++) {
+        tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
+
+        console.log(tiles[tile]);
+
+        tiles[tile].x = 80 + 64 * tile;
+        tiles[tile].y = 96;
+
+        game.addChild(tiles[tile]);
+    }
+}
 
 /* Utility function to show Player Stats */
 function showPlayerStats()
@@ -103,12 +117,12 @@ function showPlayerStats()
 
 /* Utility function to reset all fruit tallies */
 function resetFruitTally() {
-    grapes = 0;
-    bananas = 0;
-    oranges = 0;
+    fish = 0;
+    mice = 0;
+    birds = 0;
     cherries = 0;
     bars = 0;
-    bells = 0;
+    balls = 0;
     sevens = 0;
     blanks = 0;
 }
@@ -174,20 +188,20 @@ function Reels() {
         outCome[spin] = Math.floor((Math.random() * 65) + 1);
         switch (outCome[spin]) {
             case checkRange(outCome[spin], 1, 27):  // 41.5% probability
-                betLine[spin] = "blank";
+                betLine[spin] = "Blank";
                 blanks++;
                 break;
             case checkRange(outCome[spin], 28, 37): // 15.4% probability
-                betLine[spin] = "Grapes";
-                grapes++;
+                betLine[spin] = "Fish";
+                fish++;
                 break;
             case checkRange(outCome[spin], 38, 46): // 13.8% probability
-                betLine[spin] = "Banana";
-                bananas++;
+                betLine[spin] = "Mouse";
+                mice++;
                 break;
             case checkRange(outCome[spin], 47, 54): // 12.3% probability
-                betLine[spin] = "Orange";
-                oranges++;
+                betLine[spin] = "Bird";
+                birds++;
                 break;
             case checkRange(outCome[spin], 55, 59): //  7.7% probability
                 betLine[spin] = "Cherry";
@@ -198,8 +212,8 @@ function Reels() {
                 bars++;
                 break;
             case checkRange(outCome[spin], 63, 64): //  3.1% probability
-                betLine[spin] = "Bell";
-                bells++;
+                betLine[spin] = "Ball";
+                balls++;
                 break;
             case checkRange(outCome[spin], 65, 65): //  1.5% probability
                 betLine[spin] = "Seven";
@@ -215,13 +229,13 @@ function determineWinnings()
 {
     if (blanks == 0)
     {
-        if (grapes == 3) {
+        if (fish == 3) {
             winnings = playerBet * 10;
         }
-        else if(bananas == 3) {
+        else if(mice == 3) {
             winnings = playerBet * 20;
         }
-        else if (oranges == 3) {
+        else if (birds == 3) {
             winnings = playerBet * 30;
         }
         else if (cherries == 3) {
@@ -230,19 +244,19 @@ function determineWinnings()
         else if (bars == 3) {
             winnings = playerBet * 50;
         }
-        else if (bells == 3) {
+        else if (balls == 3) {
             winnings = playerBet * 75;
         }
         else if (sevens == 3) {
             winnings = playerBet * 100;
         }
-        else if (grapes == 2) {
+        else if (fish == 2) {
             winnings = playerBet * 2;
         }
-        else if (bananas == 2) {
+        else if (mice == 2) {
             winnings = playerBet * 2;
         }
-        else if (oranges == 2) {
+        else if (birds == 2) {
             winnings = playerBet * 3;
         }
         else if (cherries == 2) {
@@ -251,7 +265,7 @@ function determineWinnings()
         else if (bars == 2) {
             winnings = playerBet * 5;
         }
-        else if (bells == 2) {
+        else if (balls == 2) {
             winnings = playerBet * 10;
         }
         else if (sevens == 2) {

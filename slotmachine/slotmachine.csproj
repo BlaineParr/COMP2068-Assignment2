@@ -67,6 +67,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\images\Ball.png" />
+    <Content Include="assets\images\Blank.png" />
     <Content Include="assets\images\SpinButton.png" />
     <Content Include="css\main.css" />
     <Content Include="assets\images\Bar.png" />

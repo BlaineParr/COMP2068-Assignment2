@@ -1,6 +1,14 @@
-﻿/// <reference path="jquery.js" />
-/// <reference path="easeljs-0.8.0.min.js" />
+﻿var canvas;
+var stage: createjs.Stage;
 
+//Game Objects 
+var game: createjs.Container;
+var background: createjs.Bitmap;
+var spinButton: createjs.Bitmap;
+var tiles: createjs.Bitmap[] = [];
+var tileContainer: createjs.Container[] = [];
+
+//Game Variables
 var playerMoney = 1000;
 var winnings = 0;
 var jackpot = 5000;
@@ -11,6 +19,8 @@ var lossNumber = 0;
 var spinResult;
 var fruits = "";
 var winRatio = 0;
+
+//Tally Variables
 var grapes = 0;
 var bananas = 0;
 var oranges = 0;
@@ -20,16 +30,75 @@ var bells = 0;
 var sevens = 0;
 var blanks = 0;
 
+function init() {
+    canvas = document.getElementById("canvas");
+    stage = new createjs.Stage(canvas);
+    stage.enableMouseOver(20); // Enable mouse events
+    createjs.Ticker.setFPS(60); // 60 frames per second
+    createjs.Ticker.addEventListener("tick", gameLoop);
+
+    main();
+} //function init ends
+
+function gameLoop() {
+    stage.update(); // Refreshes our stage
+} //function gameLoop ends
+
+// Our Game Kicks off in here
+function main() {
+    // instantiate my game container
+    game = new createjs.Container();
+    game.x = 23;
+    game.y = 6;
+
+    // Create Slotmachine User Interface
+    createUI();
+
+
+    stage.addChild(game);
+} //function main ends
+
+function createUI(): void {
+    // instantiate my background
+    background = new createjs.Bitmap("assets/images/SlotMachine.png");
+    game.addChild(background);
+
+    //Spin Button
+    spinButton = new createjs.Bitmap("assets/images/SpinButton.png");
+    spinButton.x = 72;
+    spinButton.y = 226;
+    game.addChild(spinButton);
+
+    
+    //spinButton.addEventListener("click", spinReels);
+    spinButton.addEventListener("mouseover", spinButtonOver);
+    spinButton.addEventListener("mouseout", spinButtonOut);
+} //function createUI ends
+
+// Event handlers
+
+function spinButtonOut() {
+    spinButton.alpha = 1.0;
+} //function spinButtonOut ends
+
+function spinButtonOver() {
+    spinButton.alpha = 0.0;
+} //function spinButtonOut ends
+
+function spinReels() {
+    // Add Spin Reels code here
+} //function spinReels ends
+
 /* Utility function to show Player Stats */
 function showPlayerStats()
 {
     winRatio = winNumber / turn;
-    $("#jackpot").text("Jackpot: " + jackpot);
-    $("#playerMoney").text("Player Money: " + playerMoney);
-    $("#playerTurn").text("Turn: " + turn);
-    $("#playerWins").text("Wins: " + winNumber);
-    $("#playerLosses").text("Losses: " + lossNumber);
-    $("#playerWinRatio").text("Win Ratio: " + (winRatio * 100).toFixed(2) + "%");
+    //$("#jackpot").text("Jackpot: " + jackpot);
+    //$("#playerMoney").text("Player Money: " + playerMoney);
+    //$("#playerTurn").text("Turn: " + turn);
+    //$("#playerWins").text("Wins: " + winNumber);
+    //$("#playerLosses").text("Losses: " + lossNumber);
+    //$("#playerWinRatio").text("Win Ratio: " + (winRatio * 100).toFixed(2) + "%");
 }
 
 /* Utility function to reset all fruit tallies */
@@ -72,7 +141,7 @@ function checkJackPot() {
 /* Utility function to show a win message and increase player money */
 function showWinMessage() {
     playerMoney += winnings;
-    $("div#winOrLose>p").text("You Won: $" + winnings);
+    //$("div#winOrLose>p").text("You Won: $" + winnings);
     resetFruitTally();
     checkJackPot();
 }
@@ -80,7 +149,7 @@ function showWinMessage() {
 /* Utility function to show a loss message and reduce player money */
 function showLossMessage() {
     playerMoney -= playerBet;
-    $("div#winOrLose>p").text("You Lost!");
+    //$("div#winOrLose>p").text("You Lost!");
     resetFruitTally();
 }
 
@@ -205,7 +274,7 @@ function determineWinnings()
     
 }
 
-/* When the player clicks the spin button the game kicks off */
+/* When the player clicks the spin button the game kicks off 
 $("#spinButton").click(function () {
     playerBet = $("div#betEntry>input").val();
 
@@ -234,4 +303,4 @@ $("#spinButton").click(function () {
         alert("Please enter a valid bet amount");
     }
     
-});
+});*/

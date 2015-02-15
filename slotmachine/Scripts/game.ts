@@ -7,13 +7,14 @@ var background: createjs.Bitmap;
 var spinButton: createjs.Bitmap;
 var tiles: createjs.Bitmap[] = [];
 var tileContainer: createjs.Container[] = [];
+var credit: createjs.Text;
 
 //Game Variables
 var playerMoney = 1000;
 var winnings = 0;
 var jackpot = 5000;
 var turn = 0;
-var playerBet = 0;
+var playerBet = 10;
 var winNumber = 0;
 var lossNumber = 0;
 var spinResult;
@@ -54,7 +55,6 @@ function main() {
     // Create Slotmachine User Interface
     createUI();
 
-
     stage.addChild(game);
 } //function main ends
 
@@ -69,14 +69,25 @@ function createUI(): void {
     spinButton.y = 226;
     game.addChild(spinButton);
 
-    
     spinButton.addEventListener("click", spinReels);
     spinButton.addEventListener("mouseover", spinButtonOver);
     spinButton.addEventListener("mouseout", spinButtonOut);
+
+    //set up tile containers
+    for (var i = 0; i < 3; i++) {
+        tileContainer[i] = new createjs.Container();
+        tileContainer[i].x = 80 + (64 * i);
+        tileContainer[i].y = 64;
+        game.addChild(tileContainer[i]);
+    } //for ends
+
+    credit = new createjs.Text(playerMoney.toString(), "16px PokemonGB", "#000000");
+    credit.x = 80;
+    credit.y = 16;
+    game.addChild(credit);
 } //function createUI ends
 
 // Event handlers
-
 function spinButtonOut() {
     spinButton.alpha = 1.0;
 } //function spinButtonOut ends
@@ -87,20 +98,28 @@ function spinButtonOver() {
 
 function spinReels() {
     // Add Spin Reels code here
+    console.log(playerMoney); //debugging code
+    //get what was spun
     spinResult = Reels();
+
+    //This code is for debugging purposes -- remove before completion!
     fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
     console.log(fruits);
 
     for (var tile = 0; tile < 3; tile++) {
+        tileContainer[tile].removeAllChildren();
+
         tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
 
-        console.log(tiles[tile]);
+        console.log(tiles[tile]); //debugging code
 
-        tiles[tile].x = 80 + 64 * tile;
-        tiles[tile].y = 96;
+        tiles[tile].x = 0;
+        tiles[tile].y = 32;
 
-        game.addChild(tiles[tile]);
+        tileContainer[tile].addChild(tiles[tile]);
     }
+    determineWinnings();
+    credit.text = playerMoney.toString();
 }
 
 /* Utility function to show Player Stats */

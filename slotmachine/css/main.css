@@ -1,5 +1,4 @@
-﻿ul#playerStats {
-    list-style-type: none;
-    padding: 0;
-    margin: 5px;
+﻿@font-face {
+    font-family: 'PokemonGB';
+    src: url('../assets/fonts/PokemonGB.ttf') format('truetype');
 }

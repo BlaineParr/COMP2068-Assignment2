@@ -69,6 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\images\Ball.png" />
+    <Content Include="assets\images\Bet100Button.png" />
+    <Content Include="assets\images\Bet10Button.png" />
+    <Content Include="assets\images\Bet1Button.png" />
     <Content Include="assets\images\Blank.png" />
     <Content Include="assets\images\SpinButton.png" />
     <Content Include="css\main.css" />
@@ -80,8 +83,6 @@
     <Content Include="assets\images\Seven.png" />
     <Content Include="assets\images\SlotMachine.png" />
     <Content Include="index.html" />
-    <Content Include="js\jquery.js" />
-    <Content Include="js\main.js" />
     <Content Include="Scripts\lib\easeljs-0.8.0.min.js" />
     <Content Include="Scripts\lib\preloadjs-0.6.0.min.js" />
     <Content Include="Scripts\lib\soundjs-0.6.0.min.js" />

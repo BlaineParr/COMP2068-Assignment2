@@ -5,16 +5,23 @@ var stage: createjs.Stage;
 var game: createjs.Container;
 var background: createjs.Bitmap;
 var spinButton: createjs.Bitmap;
+var bet1Button: createjs.Bitmap;
+var bet10Button: createjs.Bitmap;
+var bet100Button: createjs.Bitmap;
 var tiles: createjs.Bitmap[] = [];
 var tileContainer: createjs.Container[] = [];
-var credit: createjs.Text;
+var jackpotText: createjs.Text;
+var winningsText: createjs.Text;
+var playerBetText: createjs.Text;
+var playerMoneyText: createjs.Text;
+
 
 //Game Variables
 var playerMoney = 1000;
 var winnings = 0;
 var jackpot = 5000;
 var turn = 0;
-var playerBet = 10;
+var playerBet = 0;
 var winNumber = 0;
 var lossNumber = 0;
 var spinResult;
@@ -49,8 +56,8 @@ function gameLoop() {
 function main() {
     // instantiate my game container
     game = new createjs.Container();
-    game.x = 23;
-    game.y = 6;
+    game.x = 0;
+    game.y = 0;
 
     // Create Slotmachine User Interface
     createUI();
@@ -65,13 +72,23 @@ function createUI(): void {
 
     //Spin Button
     spinButton = new createjs.Bitmap("assets/images/SpinButton.png");
-    spinButton.x = 72;
+    spinButton.x = 10;
     spinButton.y = 226;
     game.addChild(spinButton);
 
     spinButton.addEventListener("click", spinReels);
     spinButton.addEventListener("mouseover", spinButtonOver);
     spinButton.addEventListener("mouseout", spinButtonOut);
+
+    //Bet 1 Button
+    bet1Button = new createjs.Bitmap("assets/images/Bet1Button.png");
+    bet1Button.x = 122;
+    bet1Button.y = 204;
+    game.addChild(bet1Button);
+
+    bet1Button.addEventListener("click", bet1);
+    bet1Button.addEventListener("mouseover", bet1ButtonOver);
+    bet1Button.addEventListener("mouseout", bet1ButtonOut);
 
     //set up tile containers
     for (var i = 0; i < 3; i++) {
@@ -81,10 +98,27 @@ function createUI(): void {
         game.addChild(tileContainer[i]);
     } //for ends
 
-    credit = new createjs.Text(playerMoney.toString(), "16px PokemonGB", "#000000");
-    credit.x = 80;
-    credit.y = 16;
-    game.addChild(credit);
+    //set up displayed text
+    jackpotText = new createjs.Text(jackpot.toString(), "16px PokemonGB", "#000000");
+    jackpotText.x = 256;
+    jackpotText.y = 16;
+
+    winningsText = new createjs.Text(winnings.toString(), "16px PokemonGB", "#000000");
+    winningsText.x = 176;
+    winningsText.y = 16;
+
+    playerMoneyText = new createjs.Text(playerMoney.toString(), "16px PokemonGB", "#000000");
+    playerMoneyText.x = 80;
+    playerMoneyText.y = 16;
+
+    playerBetText = new createjs.Text(playerBet.toString(), "16px PokemonGB", "#000000");
+    playerBetText.x = 0;
+    playerBetText.y = 16;
+
+    game.addChild(jackpotText);
+    game.addChild(winningsText);
+    game.addChild(playerBetText);
+    game.addChild(playerMoneyText);
 } //function createUI ends
 
 // Event handlers
@@ -93,39 +127,64 @@ function spinButtonOut() {
 } //function spinButtonOut ends
 
 function spinButtonOver() {
-    spinButton.alpha = 0.5;
+    spinButton.alpha = 0.01;
 } //function spinButtonOut ends
 
 function spinReels() {
     // Add Spin Reels code here
-    console.log(playerMoney); //debugging code
-    //get what was spun
-    spinResult = Reels();
+    if (playerMoney == 0) {
+        if (confirm("You ran out of Money! \nDo you want to play again?")) {
+            resetAll();
+            showPlayerStats();
+        } //if ends
+    } //if ends
+    else if (playerBet > playerMoney) {
+        alert("You don't have enough Money to place that bet.");
+    } //else if ends
+    else if (playerBet <= playerMoney) {
+        //get what was spun
+        spinResult = Reels();
 
-    //This code is for debugging purposes -- remove before completion!
-    fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
-    console.log(fruits);
+        //This code is for debugging purposes -- remove before completion!
+        fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
+        console.log(fruits);
 
-    for (var tile = 0; tile < 3; tile++) {
-        tileContainer[tile].removeAllChildren();
+        for (var tile = 0; tile < 3; tile++) {
+            tileContainer[tile].removeAllChildren();
 
-        tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
+            tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
 
-        console.log(tiles[tile]); //debugging code
+            console.log(tiles[tile]); //debugging code
 
-        tiles[tile].x = 0;
-        tiles[tile].y = 32;
+            tiles[tile].x = 0;
+            tiles[tile].y = 32;
 
-        tileContainer[tile].addChild(tiles[tile]);
-    }
-    determineWinnings();
-    credit.text = playerMoney.toString();
-}
+            tileContainer[tile].addChild(tiles[tile]);
+        } //for ends
+        determineWinnings();
+        showPlayerStats();
+    } //else if ends
+} //function spinReels ends
+
+function bet1ButtonOut() {
+    bet1Button.alpha = 1.0;
+} //function bet1ButtonOut ends
+
+function bet1ButtonOver() {
+    bet1Button.alpha = 0.01;
+} //function bet1ButtonOut ends
+
+function bet1() {
+    playerBet = 1;
+    playerBetText.text = playerBet.toString();
+} //function bet1 ends
 
 /* Utility function to show Player Stats */
-function showPlayerStats()
-{
+function showPlayerStats() {
     winRatio = winNumber / turn;
+
+    jackpotText.text = jackpot.toString();
+    playerMoneyText.text = playerMoney.toString();
     //$("#jackpot").text("Jackpot: " + jackpot);
     //$("#playerMoney").text("Player Money: " + playerMoney);
     //$("#playerTurn").text("Turn: " + turn);
@@ -174,7 +233,7 @@ function checkJackPot() {
 /* Utility function to show a win message and increase player money */
 function showWinMessage() {
     playerMoney += winnings;
-    //$("div#winOrLose>p").text("You Won: $" + winnings);
+    winningsText.text = winnings.toString();
     resetFruitTally();
     checkJackPot();
 }
@@ -182,7 +241,7 @@ function showWinMessage() {
 /* Utility function to show a loss message and reduce player money */
 function showLossMessage() {
     playerMoney -= playerBet;
-    //$("div#winOrLose>p").text("You Lost!");
+    winningsText.text = "0";
     resetFruitTally();
 }
 

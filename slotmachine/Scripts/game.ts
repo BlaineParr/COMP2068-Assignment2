@@ -5,6 +5,8 @@ var stage: createjs.Stage;
 var game: createjs.Container;
 var background: createjs.Bitmap;
 var spinButton: createjs.Bitmap;
+var disabledButton: createjs.Bitmap;
+var resetButton: createjs.Bitmap;
 var bet1Button: createjs.Bitmap;
 var bet10Button: createjs.Bitmap;
 var bet100Button: createjs.Bitmap;
@@ -73,12 +75,30 @@ function createUI(): void {
     //Spin Button
     spinButton = new createjs.Bitmap("assets/images/SpinButton.png");
     spinButton.x = 10;
-    spinButton.y = 226;
+    spinButton.y = 234;
+    spinButton.visible = false;
     game.addChild(spinButton);
 
     spinButton.addEventListener("click", spinReels);
     spinButton.addEventListener("mouseover", spinButtonOver);
     spinButton.addEventListener("mouseout", spinButtonOut);
+
+    //Disabled Button
+    disabledButton = new createjs.Bitmap("assets/images/DisabledButton.png");
+    disabledButton.x = 10;
+    disabledButton.y = 234;
+    disabledButton.visible = true;
+    game.addChild(disabledButton);
+
+    //Reset Button
+    resetButton = new createjs.Bitmap("assets/images/ResetButton.png");
+    resetButton.x = 230;
+    resetButton.y = 234;
+    game.addChild(resetButton);
+
+    resetButton.addEventListener("click", resetAll);
+    resetButton.addEventListener("mouseover", resetButtonOver);
+    resetButton.addEventListener("mouseout", resetButtonOut);
 
     //Bet 1 Button
     bet1Button = new createjs.Bitmap("assets/images/Bet1Button.png");
@@ -90,12 +110,35 @@ function createUI(): void {
     bet1Button.addEventListener("mouseover", bet1ButtonOver);
     bet1Button.addEventListener("mouseout", bet1ButtonOut);
 
+    //Bet 10 Button
+    bet10Button = new createjs.Bitmap("assets/images/Bet10Button.png");
+    bet10Button.x = 122;
+    bet10Button.y = 234;
+    game.addChild(bet10Button);
+
+    bet10Button.addEventListener("click", bet10);
+    bet10Button.addEventListener("mouseover", bet10ButtonOver);
+    bet10Button.addEventListener("mouseout", bet10ButtonOut);
+
+    //Bet 100 Button
+    bet100Button = new createjs.Bitmap("assets/images/Bet100Button.png");
+    bet100Button.x = 122;
+    bet100Button.y = 264;
+    game.addChild(bet100Button);
+
+    bet100Button.addEventListener("click", bet100);
+    bet100Button.addEventListener("mouseover", bet100ButtonOver);
+    bet100Button.addEventListener("mouseout", bet100ButtonOut);
+
     //set up tile containers
     for (var i = 0; i < 3; i++) {
         tileContainer[i] = new createjs.Container();
         tileContainer[i].x = 80 + (64 * i);
         tileContainer[i].y = 64;
         game.addChild(tileContainer[i]);
+        tiles[i] = new createjs.Bitmap("assets/images/Default.png");
+        tiles[i].y = 32;
+        tileContainer[i].addChild(tiles[i]);
     } //for ends
 
     //set up displayed text
@@ -112,7 +155,6 @@ function createUI(): void {
     playerMoneyText.y = 16;
 
     playerBetText = new createjs.Text(playerBet.toString(), "16px PokemonGB", "#000000");
-    playerBetText.x = 0;
     playerBetText.y = 16;
 
     game.addChild(jackpotText);
@@ -156,15 +198,23 @@ function spinReels() {
 
             console.log(tiles[tile]); //debugging code
 
-            tiles[tile].x = 0;
             tiles[tile].y = 32;
 
             tileContainer[tile].addChild(tiles[tile]);
         } //for ends
         determineWinnings();
         showPlayerStats();
+        betValidate();
     } //else if ends
 } //function spinReels ends
+
+function resetButtonOut() {
+    resetButton.alpha = 1.0;
+} //function resetButtonOut ends
+
+function resetButtonOver() {
+    resetButton.alpha = 0.01;
+} //function resetButtonOut ends
 
 function bet1ButtonOut() {
     bet1Button.alpha = 1.0;
@@ -177,7 +227,51 @@ function bet1ButtonOver() {
 function bet1() {
     playerBet = 1;
     playerBetText.text = playerBet.toString();
+    betValidate();
 } //function bet1 ends
+
+function bet10ButtonOut() {
+    bet10Button.alpha = 1.0;
+} //function bet10ButtonOut ends
+
+function bet10ButtonOver() {
+    bet10Button.alpha = 0.01;
+} //function bet10ButtonOut ends
+
+function bet10() {
+    playerBet = 10;
+    playerBetText.text = playerBet.toString();
+    betValidate();
+} //function bet10 ends
+
+/* This function sets the bet 100 button to be 0% transparent when the mouse leaves it*/
+function bet100ButtonOut() {
+    bet100Button.alpha = 1.0;
+} //function bet10ButtonOut ends
+
+/* This function sets the bet 100 button to be 99% transparent when the mouse is hovering over it*/
+function bet100ButtonOver() {
+    bet100Button.alpha = 0.01;
+} //function bet10ButtonOut ends
+
+/* This function sets the player's bet to 100 and displays the bet*/
+function bet100() {
+    playerBet = 100;
+    playerBetText.text = playerBet.toString();
+    betValidate();
+} //function bet100 ends
+
+/* This function ensures the player has enough money to place their bet*/
+function betValidate() {
+    if (playerBet > playerMoney) {
+        spinButton.visible = false;
+        disabledButton.visible = true;
+    } //if ends
+    else if (playerBet < playerMoney) {
+        spinButton.visible = true;
+        disabledButton.visible = false;
+    } //else if ends
+} //funtion bet validate ends
 
 /* Utility function to show Player Stats */
 function showPlayerStats() {
@@ -185,13 +279,7 @@ function showPlayerStats() {
 
     jackpotText.text = jackpot.toString();
     playerMoneyText.text = playerMoney.toString();
-    //$("#jackpot").text("Jackpot: " + jackpot);
-    //$("#playerMoney").text("Player Money: " + playerMoney);
-    //$("#playerTurn").text("Turn: " + turn);
-    //$("#playerWins").text("Wins: " + winNumber);
-    //$("#playerLosses").text("Losses: " + lossNumber);
-    //$("#playerWinRatio").text("Win Ratio: " + (winRatio * 100).toFixed(2) + "%");
-}
+} //function showPlayerStats ends
 
 /* Utility function to reset all fruit tallies */
 function resetFruitTally() {
@@ -203,7 +291,7 @@ function resetFruitTally() {
     balls = 0;
     sevens = 0;
     blanks = 0;
-}
+} //function resetFruitTally ends
 
 /* Utility function to reset the player stats */
 function resetAll() {
@@ -215,20 +303,26 @@ function resetAll() {
     winNumber = 0;
     lossNumber = 0;
     winRatio = 0;
-}
-
+    playerBetText.text = playerBet.toString();
+    playerMoneyText.text = playerMoney.toString();
+    winningsText.text = winnings.toString();
+    jackpotText.text = jackpot.toString();
+    spinButton.visible = false;
+    disabledButton.visible = true;
+} //function resetAll ends
 
 /* Check to see if the player won the jackpot */
 function checkJackPot() {
     /* compare two random values */
     var jackPotTry = Math.floor(Math.random() * 51 + 1);
     var jackPotWin = Math.floor(Math.random() * 51 + 1);
+
     if (jackPotTry == jackPotWin) {
         alert("You Won the $" + jackpot + " Jackpot!!");
         playerMoney += jackpot;
         jackpot = 1000;
-    }
-}
+    } //function if ends
+} //function checkJackPot ends
 
 /* Utility function to show a win message and increase player money */
 function showWinMessage() {
@@ -236,25 +330,24 @@ function showWinMessage() {
     winningsText.text = winnings.toString();
     resetFruitTally();
     checkJackPot();
-}
+} //function showWinMessage ends
 
 /* Utility function to show a loss message and reduce player money */
 function showLossMessage() {
     playerMoney -= playerBet;
     winningsText.text = "0";
     resetFruitTally();
-}
+} //function showLossMessage ends
 
 /* Utility function to check if a value falls within a range of bounds */
 function checkRange(value, lowerBounds, upperBounds) {
-    if (value >= lowerBounds && value <= upperBounds)
-    {
+    if (value >= lowerBounds && value <= upperBounds) {
         return value;
-    }
+    } //if ends
     else {
         return !value;
-    }
-}
+    } //else ends
+} //function checkRange ends
 
 /* When this function is called it determines the betLine results.
 e.g. Bar - Orange - Banana */
@@ -297,10 +390,10 @@ function Reels() {
                 betLine[spin] = "Seven";
                 sevens++;
                 break;
-        }
-    }
+        } //switch ends
+    } //for ends
     return betLine;
-}
+} //function Reels ends
 
 /* This function calculates the player's winnings, if any */
 function determineWinnings()
@@ -309,90 +402,58 @@ function determineWinnings()
     {
         if (fish == 3) {
             winnings = playerBet * 10;
-        }
+        } //if ends
         else if(mice == 3) {
             winnings = playerBet * 20;
-        }
+        } //else if ends
         else if (birds == 3) {
             winnings = playerBet * 30;
-        }
+        } //else if ends
         else if (cherries == 3) {
             winnings = playerBet * 40;
-        }
+        } //else if ends
         else if (bars == 3) {
             winnings = playerBet * 50;
-        }
+        } //else if ends
         else if (balls == 3) {
             winnings = playerBet * 75;
-        }
+        } //else if ends
         else if (sevens == 3) {
             winnings = playerBet * 100;
-        }
+        } //else if ends
         else if (fish == 2) {
             winnings = playerBet * 2;
-        }
+        } //else if ends
         else if (mice == 2) {
             winnings = playerBet * 2;
-        }
+        } //else if ends
         else if (birds == 2) {
             winnings = playerBet * 3;
-        }
+        } //else if ends
         else if (cherries == 2) {
             winnings = playerBet * 4;
-        }
+        } //else if ends
         else if (bars == 2) {
             winnings = playerBet * 5;
-        }
+        } //else if ends
         else if (balls == 2) {
             winnings = playerBet * 10;
-        }
+        } //else if ends
         else if (sevens == 2) {
             winnings = playerBet * 20;
-        }
+        } //else if ends
         else if (sevens == 1) {
             winnings = playerBet * 5;
-        }
+        } //else if ends
         else {
             winnings = playerBet * 1;
-        }
+        } //else ends
         winNumber++;
         showWinMessage();
-    }
-    else
-    {
+    } //if ends
+    else {
         lossNumber++;
         showLossMessage();
-    }
+    } //else ends
     
-}
-
-/* When the player clicks the spin button the game kicks off 
-$("#spinButton").click(function () {
-    playerBet = $("div#betEntry>input").val();
-
-    if (playerMoney == 0)
-    {
-        if (confirm("You ran out of Money! \nDo you want to play again?")) {
-            resetAll();
-            showPlayerStats();
-        }
-    }
-    else if (playerBet > playerMoney) {
-        alert("You don't have enough Money to place that bet.");
-    }
-    else if (playerBet < 0) {
-        alert("All bets must be a positive $ amount.");
-    }
-    else if (playerBet <= playerMoney) {
-        spinResult = Reels();
-        fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
-        $("div#result>p").text(fruits);
-        determineWinnings();
-        turn++;
-        showPlayerStats();
-    }
-    else {
-        alert("Please enter a valid bet amount");
-    }
-    
-});*/
+} //function determineWinnings ends

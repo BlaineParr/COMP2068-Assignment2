@@ -7,6 +7,7 @@ var background: createjs.Bitmap;
 var spinButton: createjs.Bitmap;
 var disabledButton: createjs.Bitmap;
 var resetButton: createjs.Bitmap;
+var closeButton: createjs.Bitmap;
 var bet1Button: createjs.Bitmap;
 var bet10Button: createjs.Bitmap;
 var bet100Button: createjs.Bitmap;
@@ -93,12 +94,22 @@ function createUI(): void {
     //Reset Button
     resetButton = new createjs.Bitmap("assets/images/ResetButton.png");
     resetButton.x = 230;
-    resetButton.y = 234;
+    resetButton.y = 204;
     game.addChild(resetButton);
 
     resetButton.addEventListener("click", resetAll);
     resetButton.addEventListener("mouseover", resetButtonOver);
     resetButton.addEventListener("mouseout", resetButtonOut);
+
+    //Close Button
+    closeButton = new createjs.Bitmap("assets/images/CloseButton.png");
+    closeButton.x = 230;
+    closeButton.y = 264;
+    game.addChild(closeButton);
+
+    closeButton.addEventListener("click", closeGame);
+    closeButton.addEventListener("mouseover", closeButtonOver);
+    closeButton.addEventListener("mouseout", closeButtonOut);
 
     //Bet 1 Button
     bet1Button = new createjs.Bitmap("assets/images/Bet1Button.png");
@@ -163,81 +174,90 @@ function createUI(): void {
     game.addChild(playerMoneyText);
 } //function createUI ends
 
-// Event handlers
+// Event handlers/////////////////////////////////////////////////////////////////////////////////
+/* This function sets the reset button to be 0% transparent when the mouse leaves it*/
 function spinButtonOut() {
     spinButton.alpha = 1.0;
 } //function spinButtonOut ends
 
+/* This function sets the spin button to be 99% transparent when the mouse is hovering over it*/
 function spinButtonOver() {
     spinButton.alpha = 0.01;
 } //function spinButtonOut ends
 
+/* This function spins the slot machine*/
 function spinReels() {
-    // Add Spin Reels code here
-    if (playerMoney == 0) {
-        if (confirm("You ran out of Money! \nDo you want to play again?")) {
-            resetAll();
-            showPlayerStats();
-        } //if ends
-    } //if ends
-    else if (playerBet > playerMoney) {
-        alert("You don't have enough Money to place that bet.");
-    } //else if ends
-    else if (playerBet <= playerMoney) {
-        //get what was spun
-        spinResult = Reels();
+    //get what was spun
+    spinResult = Reels();
 
-        //This code is for debugging purposes -- remove before completion!
-        fruits = spinResult[0] + " - " + spinResult[1] + " - " + spinResult[2];
-        console.log(fruits);
+    //get the respecive images for the spin results
+    for(var tile = 0; tile < 3; tile++) {
+        tileContainer[tile].removeAllChildren(); //clear the tileContainer
 
-        for (var tile = 0; tile < 3; tile++) {
-            tileContainer[tile].removeAllChildren();
+        tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
 
-            tiles[tile] = new createjs.Bitmap("assets/images/" + spinResult[tile] + ".png");
+        tiles[tile].y = 32; //center the image on the reels
 
-            console.log(tiles[tile]); //debugging code
-
-            tiles[tile].y = 32;
-
-            tileContainer[tile].addChild(tiles[tile]);
-        } //for ends
-        determineWinnings();
-        showPlayerStats();
-        betValidate();
-    } //else if ends
+        tileContainer[tile].addChild(tiles[tile]); //display the image on the tileContainer
+    } //for ends
+    determineWinnings(); //determine if the player won or lost
+    showPlayerStats(); //display the results of the spin
+    betValidate(); //ensure the player still has enough money to make the same bet
 } //function spinReels ends
 
+/* This function sets the reset button to be 0% transparent when the mouse leaves it*/
 function resetButtonOut() {
     resetButton.alpha = 1.0;
 } //function resetButtonOut ends
 
+/* This function sets the close button to be 99% transparent when the mouse is hovering over it*/
 function resetButtonOver() {
     resetButton.alpha = 0.01;
 } //function resetButtonOut ends
 
+/* This function sets the close button to be 0% transparent when the mouse leaves it*/
+function closeButtonOut() {
+    closeButton.alpha = 1.0;
+} //function closeButtonOut ends
+
+/* This function sets the reset button to be 99% transparent when the mouse is hovering over it*/
+function closeButtonOver() {
+    closeButton.alpha = 0.01;
+} //function closeButtonOut ends
+
+/* This function closes the game when the close button is clicked*/
+function closeGame() {
+    window.open('', '_self').close();
+} //function closeGame ends
+
+/* This function sets the bet 1 button to be 0% transparent when the mouse leaves it*/
 function bet1ButtonOut() {
     bet1Button.alpha = 1.0;
 } //function bet1ButtonOut ends
 
+/* This function sets the bet 1 button to be 99% transparent when the mouse is hovering over it*/
 function bet1ButtonOver() {
     bet1Button.alpha = 0.01;
 } //function bet1ButtonOut ends
 
+/* This function sets the player's bet to 1 and displays the bet*/
 function bet1() {
     playerBet = 1;
     playerBetText.text = playerBet.toString();
     betValidate();
 } //function bet1 ends
 
+/* This function sets the bet 10 button to be 0% transparent when the mouse leaves it*/
 function bet10ButtonOut() {
     bet10Button.alpha = 1.0;
 } //function bet10ButtonOut ends
 
+/* This function sets the bet 10 button to be 99% transparent when the mouse is hovering over it*/
 function bet10ButtonOver() {
     bet10Button.alpha = 0.01;
 } //function bet10ButtonOut ends
 
+/* This function sets the player's bet to 10 and displays the bet*/
 function bet10() {
     playerBet = 10;
     playerBetText.text = playerBet.toString();
@@ -277,8 +297,8 @@ function betValidate() {
 function showPlayerStats() {
     winRatio = winNumber / turn;
 
-    jackpotText.text = jackpot.toString();
-    playerMoneyText.text = playerMoney.toString();
+    jackpotText.text = jackpot.toString(); //display the jackpot value
+    playerMoneyText.text = playerMoney.toString(); //display the player's money
 } //function showPlayerStats ends
 
 /* Utility function to reset all fruit tallies */

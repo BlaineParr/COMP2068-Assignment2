@@ -73,6 +73,7 @@
     <Content Include="assets\images\Bet10Button.png" />
     <Content Include="assets\images\Bet1Button.png" />
     <Content Include="assets\images\Blank.png" />
+    <Content Include="assets\images\CloseButton.png" />
     <Content Include="assets\images\Default.png" />
     <Content Include="assets\images\DisabledButton.png" />
     <Content Include="assets\images\ResetButton.png" />
